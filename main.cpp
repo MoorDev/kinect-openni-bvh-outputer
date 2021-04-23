@@ -13,6 +13,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui_c.h>//OpenCV4 Supported
 
 // o1. OpenNI Header
 #include "OpenNI.h"
@@ -182,7 +183,8 @@ int main( int argc, char **argv )
         const cv::Mat mImageRGB( mColorFrame.getHeight(), mColorFrame.getWidth(),
                                 CV_8UC3, (void*)mColorFrame.getData() );
         // p2c. convert form RGB to BGR
-        cv::cvtColor( mImageRGB, cImageBGR, CV_RGB2BGR );
+        //cv::cvtColor( mImageRGB, cImageBGR, CV_RGB2BGR );
+        cv::cvtColor(mImageRGB, cImageBGR, cv::COLOR_BGR2RGB);//OpenCV4 Supported
         
         // p3. get user frame
         UserTrackerFrameRef  mUserFrame;
