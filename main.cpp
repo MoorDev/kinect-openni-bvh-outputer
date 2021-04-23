@@ -91,7 +91,7 @@ void ProcessBonesOrientation(const nite::Skeleton &skel)
 
 void ProcessBonesOrientation_p(const nite::Skeleton &skel)
 {
-    char bvh[100000];
+    char *bvh;
     vector<Joint> joints(JOINT_SIZE);
     // Fill joints
     for (int i = 0; i < JOINT_SIZE; i++)
@@ -110,6 +110,7 @@ void ProcessBonesOrientation_p(const nite::Skeleton &skel)
     // Increase the frame number.
     //m_pKinectBVH->IncrementNbFrames();
     bvh=m_pKinectBVH->getBVHstring();
+    printf("%s",bvh);
 }
 
 int main( int argc, char **argv )
