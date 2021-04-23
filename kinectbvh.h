@@ -192,6 +192,17 @@ public:
         }
     }
     
+    char *getBVHstring() {
+
+            FilterPositions();
+            CorrectAngle(tilt_angle);
+            CreateQuaternionInformation();
+            CreateSkeletonInformation_p();
+            CreateMotionInformation_p();
+        return (m_Bvh);
+
+    }
+    
     // Set kinect tilt angle
     void SetTiltAngle(const float& angle) {
         tilt_angle = angle;
@@ -209,6 +220,7 @@ private:
     ofstream m_pFile;
     // Parent joint map.
     JointType parent_joint_map[JOINT_SIZE];
+    char m_Bvh[100000];
     
     // Add the relative offset to it parent.
     void AddOffset(const Vec3& offset) {
@@ -252,6 +264,172 @@ private:
         return angle;
     }
     
+    // Generate 'T' pose skeleton and save to file.
+    void CreateSkeletonInformation_p() {
+        stringstream flux;
+        
+        // ROOT
+        flux << "HIERARCHY" << endl;
+        flux << "ROOT Hip" << endl;
+        flux << "{" << endl;
+        
+        // Spine
+        flux << "\tOFFSET " << m_aOffsets[JOINT_TORSO].x << " "
+        << m_aOffsets[JOINT_TORSO].y << " " << m_aOffsets[JOINT_TORSO].z
+        << endl;
+        flux << "\tCHANNELS 6 Xposition Yposition Zposition Zrotation Yrotation "
+        "Xrotation"
+        << endl;
+        flux << "\tJOINT ShoulderCenter" << endl;
+        flux << "\t{" << endl;
+        // Head
+        flux << "\t\tOFFSET " << m_aOffsets[JOINT_NECK].x << " "
+        << m_aOffsets[JOINT_NECK].y << " " << m_aOffsets[JOINT_NECK].z << endl;
+        flux << "\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\tJOINT Head" << endl;
+        flux << "\t\t{" << endl;
+        // End Site
+        flux << "\t\t\tOFFSET " << m_aOffsets[JOINT_HEAD].x << " "
+        << m_aOffsets[JOINT_HEAD].y << " " << m_aOffsets[JOINT_HEAD].z << endl;
+        flux << "\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\tEnd Site" << endl;
+        flux << "\t\t\t{" << endl;
+        flux << "\t\t\t\tOFFSET 0.0 " << 8.91f * SCALE << " 0.0" << endl;
+        flux << "\t\t\t}" << endl;
+        flux << "\t\t}" << endl;
+        
+        // Shoulder Left
+        flux << "\t\tJOINT ShoulderLeft" << endl;
+        flux << "\t\t{" << endl;
+        // Elbow Left
+        flux << "\t\t\tOFFSET " << m_aOffsets[JOINT_LEFT_SHOULDER].x << " "
+        << m_aOffsets[JOINT_LEFT_SHOULDER].y << " "
+        << m_aOffsets[JOINT_LEFT_SHOULDER].z << endl;
+        flux << "\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\tJOINT ElbowLeft" << endl;
+        flux << "\t\t\t{" << endl;
+        // Wrist Left
+        flux << "\t\t\t\tOFFSET " << m_aOffsets[JOINT_LEFT_ELBOW].x << " "
+        << m_aOffsets[JOINT_LEFT_ELBOW].y << " "
+        << m_aOffsets[JOINT_LEFT_ELBOW].z << endl;
+        flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\t\tJOINT WristLeft" << endl;
+        flux << "\t\t\t\t{" << endl;
+        // Hand Left
+        flux << "\t\t\t\t\tOFFSET " << m_aOffsets[JOINT_LEFT_HAND].x << " "
+        << m_aOffsets[JOINT_LEFT_HAND].y << " "
+        << m_aOffsets[JOINT_LEFT_HAND].z << endl;
+        flux << "\t\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\t\t\tEnd Site" << endl;
+        flux << "\t\t\t\t\t{" << endl;
+        flux << "\t\t\t\t\t\tOFFSET " << -8.32f * SCALE << " 0.0 0.0" << endl;
+        flux << "\t\t\t\t\t}" << endl;
+        flux << "\t\t\t\t}" << endl;
+        flux << "\t\t\t}" << endl;
+        flux << "\t\t}" << endl;
+        
+        // Shoulder Right
+        flux << "\t\tJOINT ShoulderRight" << endl;
+        flux << "\t\t{" << endl;
+        // Elbow Right
+        flux << "\t\t\tOFFSET " << m_aOffsets[JOINT_RIGHT_SHOULDER].x << " "
+        << m_aOffsets[JOINT_RIGHT_SHOULDER].y << " "
+        << m_aOffsets[JOINT_RIGHT_SHOULDER].z << endl;
+        flux << "\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\tJOINT ElbowRight" << endl;
+        flux << "\t\t\t{" << endl;
+        // Wrist Right
+        flux << "\t\t\t\tOFFSET " << m_aOffsets[JOINT_RIGHT_ELBOW].x << " "
+        << m_aOffsets[JOINT_RIGHT_ELBOW].y << " "
+        << m_aOffsets[JOINT_RIGHT_ELBOW].z << endl;
+        flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\t\tJOINT WristRight" << endl;
+        flux << "\t\t\t\t{" << endl;
+        // Hand Right
+        flux << "\t\t\t\t\tOFFSET " << m_aOffsets[JOINT_RIGHT_HAND].x << " "
+        << m_aOffsets[JOINT_RIGHT_HAND].y << " "
+        << m_aOffsets[JOINT_RIGHT_HAND].z << endl;
+        flux << "\t\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\t\t\tEnd Site" << endl;
+        flux << "\t\t\t\t\t{" << endl;
+        flux << "\t\t\t\t\t\tOFFSET " << 8.32f * SCALE << " 0.0 0.0" << endl;
+        flux << "\t\t\t\t\t}" << endl;
+        flux << "\t\t\t\t}" << endl;
+        flux << "\t\t\t}" << endl;
+        flux << "\t\t}" << endl;
+        
+        flux << "\t}" << endl;
+        
+        // Hip Left
+        flux << "\tJOINT HipLeft" << endl;
+        flux << "\t{" << endl;
+        
+        // Knee Left
+        flux << "\t\tOFFSET " << m_aOffsets[JOINT_LEFT_HIP].x << " "
+        << m_aOffsets[JOINT_LEFT_HIP].y << " " << m_aOffsets[JOINT_LEFT_HIP].z
+        << endl;
+        flux << "\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\tJOINT KneeLeft" << endl;
+        flux << "\t\t{" << endl;
+        
+        // Ankle Left
+        flux << "\t\t\tOFFSET " << m_aOffsets[JOINT_LEFT_KNEE].x << " "
+        << m_aOffsets[JOINT_LEFT_KNEE].y << " "
+        << m_aOffsets[JOINT_LEFT_KNEE].z << endl;
+        flux << "\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\tJOINT AnkleLeft" << endl;
+        flux << "\t\t\t{" << endl;
+        
+        // Foot Left
+        flux << "\t\t\t\tOFFSET " << m_aOffsets[JOINT_LEFT_FOOT].x << " "
+        << m_aOffsets[JOINT_LEFT_FOOT].y << " "
+        << m_aOffsets[JOINT_LEFT_FOOT].z << endl;
+        flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\t\tEnd Site" << endl;
+        flux << "\t\t\t\t{" << endl;
+        flux << "\t\t\t\t\tOFFSET 0.0 0.0 " << 8.91f * SCALE << endl;
+        flux << "\t\t\t\t}" << endl;
+        flux << "\t\t\t}" << endl;
+        flux << "\t\t}" << endl;
+        flux << "\t}" << endl;
+        
+        // Hip Right
+        flux << "\tJOINT HipRight" << endl;
+        flux << "\t{" << endl;
+        
+        // Knee Right
+        flux << "\t\tOFFSET " << m_aOffsets[JOINT_RIGHT_HIP].x << " "
+        << m_aOffsets[JOINT_RIGHT_HIP].y << " "
+        << m_aOffsets[JOINT_RIGHT_HIP].z << endl;
+        flux << "\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\tJOINT KneeRight" << endl;
+        flux << "\t\t{" << endl;
+        
+        // Ankle Right
+        flux << "\t\t\tOFFSET " << m_aOffsets[JOINT_RIGHT_KNEE].x << " "
+        << m_aOffsets[JOINT_RIGHT_KNEE].y << " "
+        << m_aOffsets[JOINT_RIGHT_KNEE].z << endl;
+        flux << "\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\tJOINT AnkleRight" << endl;
+        flux << "\t\t\t{" << endl;
+        
+        // Foot Right
+        flux << "\t\t\t\tOFFSET " << m_aOffsets[JOINT_RIGHT_FOOT].x << " "
+        << m_aOffsets[JOINT_RIGHT_FOOT].y << " "
+        << m_aOffsets[JOINT_RIGHT_FOOT].z << endl;
+        flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\t\tEnd Site" << endl;
+        flux << "\t\t\t\t{" << endl;
+        flux << "\t\t\t\t\tOFFSET 0.0 0.0 " << 8.91f * SCALE << endl;
+        flux << "\t\t\t\t}" << endl;
+        flux << "\t\t\t}" << endl;
+        flux << "\t\t}" << endl;
+        flux << "\t}" << endl;
+        
+        flux << "}" << endl;
+        
+        m_Bvh << flux.str();
+    }
     // Generate 'T' pose skeleton and save to file.
     void CreateSkeletonInformation() {
         stringstream flux;
@@ -418,7 +596,41 @@ private:
         
         m_pFile << flux.str();
     }
-    
+    void CreateMotionInformation_p() {
+        stringstream flux;
+        
+        flux << "MOTION" << endl;
+        flux << "Frames: " << m_nbFrame << endl;
+        flux << "Frame Time: " << FPS << endl;
+        
+        for (int i = 0; i < static_cast<int>(m_vJointsOrientation.size() / JOINT_SIZE); i++) {
+            // The position of the root joint in centimeter, as the unit in Freenect is millimeter, we multiple it 0.1.
+            Joint* joints = &m_vJointsOrientation[i * JOINT_SIZE];
+            flux << joints[JOINT_TORSO].pos.x * SCALE * 0.1f << " " << joints[JOINT_TORSO].pos.y * SCALE * 0.1f << " "
+            << joints[JOINT_TORSO].pos.z * SCALE * 0.1f << " ";
+            
+            // Write the Euler angle of every joint(ZYX).
+            WriteJoint(flux, joints, JOINT_TORSO);
+            WriteJoint(flux, joints, JOINT_NECK);
+            WriteJoint(flux, joints, JOINT_HEAD);
+            WriteJoint(flux, joints, JOINT_LEFT_SHOULDER);
+            WriteJoint(flux, joints, JOINT_LEFT_ELBOW);
+            WriteJoint(flux, joints, JOINT_LEFT_HAND);
+            WriteJoint(flux, joints, JOINT_RIGHT_SHOULDER);
+            WriteJoint(flux, joints, JOINT_RIGHT_ELBOW);
+            WriteJoint(flux, joints, JOINT_RIGHT_HAND);
+            WriteJoint(flux, joints, JOINT_LEFT_HIP);
+            WriteJoint(flux, joints, JOINT_LEFT_KNEE);
+            WriteJoint(flux, joints, JOINT_LEFT_FOOT);
+            WriteJoint(flux, joints, JOINT_RIGHT_HIP);
+            WriteJoint(flux, joints, JOINT_RIGHT_KNEE);
+            WriteJoint(flux, joints, JOINT_RIGHT_FOOT);
+            
+            flux << endl;
+        }
+        
+        m_Bvh << flux.str();
+    }
     // Generate motion capture data and save to file.
     void CreateMotionInformation() {
         stringstream flux;
