@@ -89,6 +89,29 @@ void ProcessBonesOrientation(const nite::Skeleton &skel)
     m_pKinectBVH->IncrementNbFrames();
 }
 
+void ProcessBonesOrientation_p(const nite::Skeleton &skel)
+{
+    char bvh[100000];
+    vector<Joint> joints(JOINT_SIZE);
+    // Fill joints
+    for (int i = 0; i < JOINT_SIZE; i++)
+    {
+        nite::Point3f pos = skel.getJoint((nite::JointType)i).getPosition();
+        joints[i].pos.x = pos.x;
+        joints[i].pos.y = pos.y;
+        // convert to right hand coordinate
+        joints[i].pos.z = -pos.z;
+        joints[i].tracked = skel.getJoint((nite::JointType)i).getPositionConfidence() > 0.5f;
+    }
+    
+    // Add the positions of all joints.
+    //m_pKinectBVH->AddAllJointsPosition(&joints[0]);
+    
+    // Increase the frame number.
+    //m_pKinectBVH->IncrementNbFrames();
+    bvh=m_pKinectBVH->getBVHstring();
+}
+
 int main( int argc, char **argv )
 {
     // read tilt angle from file
