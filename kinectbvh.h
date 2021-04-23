@@ -428,7 +428,7 @@ private:
         
         flux << "}" << endl;
         
-        m_Bvh << flux.str();
+        strcpy(m_Bvh, flux.str().c_str());
     }
     // Generate 'T' pose skeleton and save to file.
     void CreateSkeletonInformation() {
@@ -629,7 +629,7 @@ private:
             flux << endl;
         }
         
-        m_Bvh << flux.str();
+        strcpy(m_Bvh, flux.str().c_str());
     }
     // Generate motion capture data and save to file.
     void CreateMotionInformation() {
