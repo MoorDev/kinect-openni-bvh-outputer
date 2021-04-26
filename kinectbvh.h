@@ -629,7 +629,7 @@ private:
             flux << endl;
         }
         
-        strcpy(m_Bvh, flux.str().c_str());
+        strcat(m_Bvh, flux.str().c_str());
     }
     // Generate motion capture data and save to file.
     void CreateMotionInformation() {
