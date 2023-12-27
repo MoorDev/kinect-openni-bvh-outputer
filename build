@@ -1,0 +1,4 @@
+g++ main.cpp -I OpenNI2_Include -I NiTE2_Include -lOpenNI2 -lNiTE2 `pkg-config opencv --cflags --libs`
+
+g++ main.cpp -I OpenNI2_Include -I NiTE2_Include -L./ -lOpenNI2 -lNiTE2 `pkg-config opencv4 --cflags --libs` -Wl,-rpath='$ORIGIN'
+
